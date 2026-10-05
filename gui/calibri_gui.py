@@ -33,6 +33,7 @@ class CalibriGUI(tk.Tk):
         self.configure(bg="#07111f")
         self.proc = None
         self.log_queue = queue.Queue()
+        self.status_queue = queue.Queue()
         self._build_style()
         self._build_ui()
         self.after(100, self._drain_log)
@@ -108,17 +109,26 @@ class CalibriGUI(tk.Tk):
         self.log_queue.put(text.rstrip())
 
     def _drain_log(self):
-        while not self.log_queue.empty():
-            line = self.log_queue.get_nowait()
+        while True:
+            try:
+                line = self.log_queue.get_nowait()
+            except queue.Empty:
+                break
             self.console.insert("end", line + "\n")
             self.console.see("end")
+        while True:
+            try:
+                status = self.status_queue.get_nowait()
+            except queue.Empty:
+                break
+            self.status.configure(text=status)
         self.after(100, self._drain_log)
 
     def _run(self, args, label):
         if self.proc and self.proc.poll() is None:
             messagebox.showwarning("Calibri", "A process is already running.")
             return
-        self.status.configure(text=label.upper())
+        self.status_queue.put(label.upper())
         self._write("$ " + " ".join(map(str, args)))
         def worker():
             try:
@@ -132,10 +142,10 @@ class CalibriGUI(tk.Tk):
                     self._write(line)
                 code = self.proc.wait()
                 self._write(f"Process exited with code {code}.")
-                self.status.configure(text="READY" if code == 0 else f"FAILED ({code})")
+                self.status_queue.put("READY" if code == 0 else f"FAILED ({code})")
             except Exception as e:
                 self._write(f"ERROR: {e}")
-                self.status.configure(text="ERROR")
+                self.status_queue.put("ERROR")
             finally:
                 self.proc = None
         threading.Thread(target=worker, daemon=True).start()
@@ -177,7 +187,7 @@ class CalibriGUI(tk.Tk):
         if self.proc and self.proc.poll() is None:
             self.proc.terminate()
             self._write("Process termination requested.")
-            self.status.configure(text="STOPPING")
+            self.status_queue.put("STOPPING")
 
     def open_outputs(self):
         out = Path(self.output.get()).expanduser()
