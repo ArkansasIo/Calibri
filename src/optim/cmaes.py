@@ -121,12 +121,17 @@ class CMAESTrainer:
         ## to-do: redo with sampler to support resume option
         self._train_iter = iter(self.train_loader) if self.train_loader is not None else None
 
-        # history
-        self.hist_train_best: List[float] = []
-        self.hist_train_best_scores: List[float] = []
-        self.hist_train_mean: List[float] = []
-        self.hist_val: List[Optional[float]] = []
-        self.hist_sigma: List[float] = []
+        # Preserve history loaded from a resume checkpoint.
+        if not hasattr(self, "hist_train_best"):
+            self.hist_train_best = []
+        if not hasattr(self, "hist_train_best_scores"):
+            self.hist_train_best_scores = []
+        if not hasattr(self, "hist_train_mean"):
+            self.hist_train_mean = []
+        if not hasattr(self, "hist_val"):
+            self.hist_val = []
+        if not hasattr(self, "hist_sigma"):
+            self.hist_sigma = []
 
     def _is_dist(self):
         return dist.is_available() and dist.is_initialized()
@@ -308,7 +313,9 @@ class CMAESTrainer:
                 total_count += count
 
         if self.eval_reward_fn:
-            return {name: score / total_count for name, score in total_scores.items()}
+            if total_count <= 0 or total_scores is None:
+                return {}
+            return {name: float(score) / float(total_count) for name, score in total_scores.items()}
         else:
             return None
 
