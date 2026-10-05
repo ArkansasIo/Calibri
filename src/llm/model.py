@@ -2,6 +2,8 @@ from dataclasses import dataclass
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from .attention import GQAAttention
+from .moe import TopKMoE
 
 @dataclass
 class ModelConfig:
@@ -12,33 +14,39 @@ class ModelConfig:
     num_key_value_heads: int = 4
     intermediate_size: int = 4096
     max_position_embeddings: int = 4096
+    rope_theta: float = 500000.0
+    moe_enabled: bool = False
+    num_experts: int = 8
+    moe_top_k: int = 2
 
 class DecoderBlock(nn.Module):
     def __init__(self, cfg):
         super().__init__()
         self.norm1 = nn.RMSNorm(cfg.hidden_size)
-        self.attn = nn.MultiheadAttention(cfg.hidden_size, cfg.num_attention_heads, batch_first=True)
+        self.attn = GQAAttention(cfg.hidden_size, cfg.num_attention_heads,
+                                 cfg.num_key_value_heads, cfg.rope_theta)
         self.norm2 = nn.RMSNorm(cfg.hidden_size)
-        self.mlp = nn.Sequential(
+        self.moe = TopKMoE(cfg.hidden_size, cfg.intermediate_size,
+                           cfg.num_experts, cfg.moe_top_k) if cfg.moe_enabled else None
+        self.mlp = None if self.moe is not None else nn.Sequential(
             nn.Linear(cfg.hidden_size, cfg.intermediate_size),
-            nn.SiLU(),
-            nn.Linear(cfg.intermediate_size, cfg.hidden_size),
-        )
+            nn.SiLU(), nn.Linear(cfg.intermediate_size, cfg.hidden_size))
 
-    def forward(self, x):
-        n = x.size(1)
-        mask = torch.full((n, n), float("-inf"), device=x.device)
-        mask = torch.triu(mask, diagonal=1)
-        x = x + self.attn(self.norm1(x), self.norm1(x), self.norm1(x), attn_mask=mask, need_weights=False)[0]
-        x = x + self.mlp(self.norm2(x))
-        return x
+    def forward(self, x, past_key_value=None, use_cache=False):
+        attn_out, present = self.attn(self.norm1(x), past_key_value, use_cache)
+        x = x + attn_out
+        aux_loss = x.new_zeros(())
+        if self.moe is not None:
+            ff, aux_loss = self.moe(self.norm2(x))
+        else:
+            ff = self.mlp(self.norm2(x))
+        return x + ff, present, aux_loss
 
 class CalibriLLM(nn.Module):
-    """Reference decoder LLM.
+    """Development-scale decoder with GQA, RoPE, optional sparse MoE and KV cache.
 
-    The class is intentionally a runnable reference model. It does not instantiate
-    the 100T configuration by default; the distributed/MoE runtime must be selected
-    explicitly for that scale.
+    The 100T configuration remains a distributed architecture plan and is never
+    materialized by this reference class automatically.
     """
     def __init__(self, cfg: ModelConfig):
         super().__init__()
@@ -48,13 +56,20 @@ class CalibriLLM(nn.Module):
         self.norm = nn.RMSNorm(cfg.hidden_size)
         self.lm_head = nn.Linear(cfg.hidden_size, cfg.vocab_size, bias=False)
 
-    def forward(self, input_ids, labels=None):
+    def forward(self, input_ids, labels=None, past_key_values=None, use_cache=False):
         x = self.embed(input_ids)
-        for block in self.blocks:
-            x = block(x)
+        presents = [] if use_cache else None
+        aux_loss = x.new_zeros(())
+        for i, block in enumerate(self.blocks):
+            past = None if past_key_values is None else past_key_values[i]
+            x, present, block_aux = block(x, past, use_cache)
+            aux_loss = aux_loss + block_aux
+            if use_cache:
+                presents.append(present)
         logits = self.lm_head(self.norm(x))
         loss = None
         if labels is not None:
             loss = F.cross_entropy(logits[:, :-1].contiguous().view(-1, logits.size(-1)),
                                    labels[:, 1:].contiguous().view(-1))
-        return {"logits": logits, "loss": loss}
+        return {"logits": logits, "loss": loss, "aux_loss": aux_loss,
+                "past_key_values": presents}
