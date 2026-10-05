@@ -1,0 +1,25 @@
+name: Build Calibri Windows GUI
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'gui/**'
+      - 'scripts/build_gui_exe.bat'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build GUI EXE
+        shell: cmd
+        run: scripts\build_gui_exe.bat
+      - name: Upload GUI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Calibri-Windows-GUI
+          path: dist\Calibri\
