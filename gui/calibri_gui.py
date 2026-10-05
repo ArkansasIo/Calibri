@@ -3,6 +3,7 @@ import queue
 import subprocess
 import sys
 import threading
+import time
 import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
@@ -44,6 +45,7 @@ class CalibriGUI(tk.Tk):
         self.minsize(900, 620)
         self.configure(bg="#07111f")
         self.proc = None
+        self.proc_lock = threading.Lock()
         self.log_queue = queue.Queue()
         self.status_queue = queue.Queue()
         self._build_style()
@@ -99,6 +101,7 @@ class CalibriGUI(tk.Tk):
         ttk.Button(out, text="...", width=3, command=self._browse).pack(side="right", padx=(5, 0))
 
         ttk.Button(left, text="SYSTEM CHECK", command=self.system_check).pack(fill="x", pady=4)
+        ttk.Button(left, text="SETUP / REPAIR", command=self.setup_repair).pack(fill="x", pady=4)
         ttk.Button(left, text="GENERATE IMAGE", style="Accent.TButton", command=self.generate).pack(fill="x", pady=4)
         ttk.Button(left, text="STOP PROCESS", command=self.stop_process).pack(fill="x", pady=4)
         ttk.Button(left, text="OPEN OUTPUTS", command=self.open_outputs).pack(fill="x", pady=4)
@@ -146,20 +149,25 @@ class CalibriGUI(tk.Tk):
             try:
                 env = os.environ.copy()
                 env["PYTHONUNBUFFERED"] = "1"
-                self.proc = subprocess.Popen(
+                proc = subprocess.Popen(
                     args, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                    text=True, bufsize=1, env=env
+                    text=True, bufsize=1, env=env,
+                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0,
                 )
-                for line in self.proc.stdout:
+                with self.proc_lock:
+                    self.proc = proc
+                for line in proc.stdout:
                     self._write(line)
-                code = self.proc.wait()
+                code = proc.wait()
                 self._write(f"Process exited with code {code}.")
                 self.status_queue.put("READY" if code == 0 else f"FAILED ({code})")
             except Exception as e:
                 self._write(f"ERROR: {e}")
                 self.status_queue.put("ERROR")
             finally:
-                self.proc = None
+                with self.proc_lock:
+                    if self.proc is proc:
+                        self.proc = None
         threading.Thread(target=worker, daemon=True).start()
 
     def _python(self):
@@ -196,15 +204,41 @@ class CalibriGUI(tk.Tk):
         self._run(args, "Generating")
 
     def stop_process(self):
-        if self.proc and self.proc.poll() is None:
-            self.proc.terminate()
-            self._write("Process termination requested.")
-            self.status_queue.put("STOPPING")
+        with self.proc_lock:
+            proc = self.proc
+        if not proc or proc.poll() is not None:
+            self.status_queue.put("READY")
+            return
+        self.status_queue.put("STOPPING")
+        if os.name == "nt":
+            self._write(f"Stopping process tree (PID {proc.pid})...")
+            result = subprocess.run(
+                ["taskkill", "/PID", str(proc.pid), "/T", "/F"],
+                capture_output=True, text=True, check=False,
+            )
+            output = (result.stdout or result.stderr or "").strip()
+            if output:
+                self._write(output)
+        else:
+            proc.terminate()
+        for _ in range(20):
+            if proc.poll() is not None:
+                break
+            time.sleep(0.1)
+        self._write("Process tree stopped." if proc.poll() is not None else "WARNING: process did not exit after termination request.")
 
     def open_outputs(self):
         out = Path(self.output.get()).expanduser()
         out.mkdir(parents=True, exist_ok=True)
         os.startfile(out) if os.name == "nt" else subprocess.Popen(["xdg-open", str(out)])
+
+    def setup_repair(self):
+        script = ROOT / "scripts" / "setup_windows.bat"
+        if not script.exists():
+            messagebox.showerror("Calibri", "Windows setup script is missing.")
+            return
+        subprocess.Popen(["cmd", "/c", str(script)], cwd=ROOT)
+        self._write("Started Windows setup / repair. See the setup window for details.")
 
     def build_exe(self):
         script = ROOT / "scripts" / "build_gui_exe.bat"
