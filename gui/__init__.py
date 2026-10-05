@@ -1,0 +1,1 @@
+"""Calibri desktop GUI package."""
