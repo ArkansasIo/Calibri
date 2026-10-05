@@ -7,7 +7,19 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
-ROOT = Path(__file__).resolve().parents[1]
+def _find_root():
+    candidates = []
+    if getattr(sys, "frozen", False):
+        candidates.extend([Path(sys.executable).resolve().parent, Path.cwd().resolve()])
+    else:
+        candidates.append(Path(__file__).resolve().parents[1])
+    for candidate in candidates:
+        for root in [candidate, *candidate.parents]:
+            if (root / "scripts" / "inference.py").exists() and (root / "configs").exists():
+                return root
+    return candidates[0] if candidates else Path.cwd()
+
+ROOT = _find_root()
 
 MODELS = {
     "FLUX.1-dev — Calibri Gates": {
