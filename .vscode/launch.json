@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Calibri GUI",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}\\gui\\calibri_gui.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Calibri Inference — FLUX",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "accelerate.commands.launch",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "scripts/inference.py",
+        "--config", "configs/calibri.py:cmaes_hpsv3_flux_gates",
+        "--checkpoint_path", "weights/flux_gates.json",
+        "--prompt", "a futuristic city at sunset",
+        "--save_dir", "outputs/vscode"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}
