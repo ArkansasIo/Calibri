@@ -32,7 +32,7 @@ def jpeg_compressibility():
 def aesthetic_score():
     from src.metrics.aesthetic_scorer import AestheticScorer
 
-    scorer = AestheticScorer(dtype=torch.float32).cuda()
+    scorer = AestheticScorer(dtype=torch.float32, device=device)
 
     def _fn(images, prompts, metadata):
         if isinstance(images, torch.Tensor):
@@ -62,7 +62,7 @@ def clip_score():
 def image_similarity_score(device):
     from src.metrics.clip_scorer import ClipScorer
 
-    scorer = ClipScorer(device=device).cuda()
+    scorer = ClipScorer(device=device)
 
     def _fn(images, ref_images):
         if not isinstance(images, torch.Tensor):
