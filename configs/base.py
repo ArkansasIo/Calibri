@@ -15,6 +15,9 @@ def get_config():
     cfg.model = ConfigDict()
     cfg.model.model_name = "black-forest-labs/FLUX.1-dev"
     cfg.model.dtype = "bf16"
+    # Target architecture budget. This is metadata/configuration only; it does not
+    # allocate 100 trillion parameters in memory. See README for feasibility notes.
+    cfg.model.target_parameter_count = 100_000_000_000_000
 
     cfg.gen = ConfigDict()
     cfg.gen.num_inference_steps = 15
