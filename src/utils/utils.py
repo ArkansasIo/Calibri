@@ -44,25 +44,27 @@ def to_pil_list(images):
             pil_images.append(Image.fromarray(im))
     return pil_images
 
-def mean_score(scores, mode="mean") -> float:
+def mean_score(scores, mode="mean") -> dict:
+    """Reduce reward sequences safely to scalar means or sums."""
+    if mode not in {"mean", "sum"}:
+        raise ValueError(f"Unsupported score reduction mode: {mode}")
     res_scores = {}
     for name, score_seq in scores.items():
         if score_seq is None:
             res_scores[name] = -np.inf
+            continue
         if torch.is_tensor(score_seq):
             if score_seq.numel() == 0:
                 res_scores[name] = -np.inf
-            if mode == "mean":
-                res_scores[name] = float(score_seq.float().mean().item())
-            elif mode == "sum":
-                res_scores[name] = float(score_seq.float().sum().item())
-        else:
-            if len(score_seq) == 0:
-                res_scores[name] = -np.inf
-            if mode == "mean":
-                res_scores[name] = float(np.mean([float(s) for s in score_seq]))
-            elif mode == "sum":
-                res_scores[name] = float(np.sum([float(s) for s in score_seq]))
+                continue
+            value = score_seq.float().mean() if mode == "mean" else score_seq.float().sum()
+            res_scores[name] = float(value.item())
+            continue
+        values = [float(s) for s in score_seq]
+        if not values:
+            res_scores[name] = -np.inf
+            continue
+        res_scores[name] = float(np.mean(values) if mode == "mean" else np.sum(values))
     return res_scores
 
 def call_reward(fn, images, prompts, metadata=None):
