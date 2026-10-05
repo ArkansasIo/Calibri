@@ -23,6 +23,9 @@ def get_config():
     cfg.gen.image_size = 512
 
     cfg.scaleguidance = ConfigDict()
+    cfg.scaleguidance.num_models = 1
+    cfg.scaleguidance.use_cfg = False
+    cfg.scaleguidance.negative_prompt = ""
 
     cfg.optimize = ConfigDict()
     cfg.optimize.initial_sigma = 0.25
@@ -35,7 +38,12 @@ def get_config():
     cfg.optimize.models_bound_high = 10.0
     cfg.optimize.bucket_size = 16
 
+    cfg.reward_fn = {}
+    cfg.reward_fn_eval = {}
+
     cfg.data = ConfigDict()
+    cfg.data.train_dataset = "data/t2i_compbench_train.txt"
+    cfg.data.val_dataset = "data/t2i_compbench_val_random_crop.txt"
     cfg.data.batch_size_train = 4
     cfg.data.batch_size_val = 4
     cfg.data.num_workers = 2
