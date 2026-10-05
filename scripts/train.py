@@ -20,6 +20,7 @@ from src.utils.logging_tb import create_writer, NullWriter
 from src.data.prompts import make_loader
 from src.optim.cmaes import CMAESTrainer
 from src.models import get_pipeline_by_name
+from src.models.scale_runtime import validate_scale_config
 
 _CONFIG = config_flags.DEFINE_config_file("config", "configs/base.py", "Training configuration.")
 
@@ -27,6 +28,12 @@ _CONFIG = config_flags.DEFINE_config_file("config", "configs/base.py", "Training
 def main(_):
 
     cfg = _CONFIG.value
+
+    scale_status = validate_scale_config(cfg)
+    if not scale_status["valid"]:
+        raise ValueError("Invalid large-model configuration: " + "; ".join(scale_status["errors"]))
+    if int(scale_status["target_parameters"]) >= 100_000_000_000_000 and not bool(scale_status["distributed"]):
+        raise RuntimeError("100T configuration requires distributed execution; refusing single-device allocation.")
 
     accelerator = Accelerator()
     if cfg.experiment.seed is not None:
