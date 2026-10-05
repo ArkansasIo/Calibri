@@ -417,7 +417,8 @@ class CMAESTrainer:
 
 
     def train(self) -> Tuple[np.ndarray, float, float]:
-        generation = 0
+        # Resume from the checkpoint generation instead of restarting at zero.
+        generation = int(getattr(self, "generation", 0))
         max_gens = int(self.cfg.optimize.max_generations)
         base_seed = int(getattr(self.cfg.experiment, "seed", 0))
 
@@ -429,10 +430,14 @@ class CMAESTrainer:
                                               save_images=getattr(self.cfg.data, "save_eval_imgs", None),
                                               seed=1234)
             if self._rank() == 0:
-                for name, score in val_score.items():
-                    log_scalars(self.writer, {f"val/{name}": float(score)}, generation)
-                # self._maybe_log_images(generation, orig_x)
-                self._checkpoint_json(generation, -1.0, -1.0, val_score["avg"], orig_x)
+                if val_score:
+                    for name, score in val_score.items():
+                        log_scalars(self.writer, {f"val/{name}": float(score)}, generation)
+                    # self._maybe_log_images(generation, orig_x)
+                    self._checkpoint_json(generation, -1.0, -1.0, val_score.get("avg"), orig_x)
+                else:
+                    # Validation can be unavailable when no evaluation rewards are configured.
+                    self._checkpoint_json(generation, -1.0, -1.0, None, orig_x)
                 self._save_state(generation)
 
         while not self.es.stop() and (generation < max_gens or max_gens < 0):
@@ -522,22 +527,30 @@ class CMAESTrainer:
                 )
                 if self._rank() == 0:
                     self.hist_val.append(val_score)
-                    for name, score in val_score.items():
-                        log_scalars(self.writer, {f"val/{name}": float(score)}, step)
-                    # self._maybe_log_images(step, best_sol)
-                    if val_score["avg"] > self.best_val:
-                        self.best_val = float(val_score["avg"])
-                    self._checkpoint_json(step, 
-                                          self.best_train, 
-                                          float(self.hist_train_mean[-1]), 
-                                          self.hist_val[-1]["avg"], 
-                                          best_sol)
+                    if val_score:
+                        for name, score in val_score.items():
+                            log_scalars(self.writer, {f"val/{name}": float(score)}, step)
+                        # self._maybe_log_images(step, best_sol)
+                        if "avg" in val_score and val_score["avg"] > self.best_val:
+                            self.best_val = float(val_score["avg"])
+                        val_fit = val_score.get("avg")
+                    else:
+                        # Keep training alive when validation has no usable reward output.
+                        val_fit = None
+                    self._checkpoint_json(
+                        step,
+                        self.best_train,
+                        float(self.hist_train_mean[-1]),
+                        val_fit,
+                        best_sol,
+                    )
                     self._save_state(step)
             else:
                 if self._rank() == 0:
                     self.hist_val.append(None)
 
             generation += 1
+            self.generation = generation
 
         if self._rank() == 0:
             last_mean = float(self.hist_train_mean[-1]) if self.hist_train_mean else float("-inf")
