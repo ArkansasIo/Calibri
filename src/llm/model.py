@@ -7,14 +7,14 @@ from .moe import TopKMoE
 
 @dataclass
 class ModelConfig:
-    vocab_size: int = 131072
-    hidden_size: int = 1024
-    num_layers: int = 12
-    num_attention_heads: int = 16
-    num_key_value_heads: int = 4
-    intermediate_size: int = 4096
-    max_position_embeddings: int = 4096
-    rope_theta: float = 500000.0
+    vocab_size: int = 11
+    hidden_size: int = 2
+    num_layers: int = 1
+    num_attention_heads: int = 1
+    num_key_value_heads: int = 1
+    intermediate_size: int = 9
+    max_position_embeddings: int = 64
+    rope_theta: float = 10000.0
     moe_enabled: bool = False
     num_experts: int = 8
     moe_top_k: int = 2
@@ -54,7 +54,7 @@ class CalibriLLM(nn.Module):
         self.embed = nn.Embedding(cfg.vocab_size, cfg.hidden_size)
         self.blocks = nn.ModuleList([DecoderBlock(cfg) for _ in range(cfg.num_layers)])
         self.norm = nn.RMSNorm(cfg.hidden_size)
-        self.lm_head = nn.Linear(cfg.hidden_size, cfg.vocab_size, bias=False)
+        self.lm_head = nn.Linear(cfg.hidden_size, cfg.vocab_size, bias=True)
 
     def forward(self, input_ids, labels=None, past_key_values=None, use_cache=False):
         x = self.embed(input_ids)
