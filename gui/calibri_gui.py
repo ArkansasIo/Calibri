@@ -144,6 +144,10 @@ class CalibriGUI(tk.Tk):
         venv = ROOT / ".venv" / "Scripts" / "python.exe"
         return str(venv if venv.exists() else sys.executable)
 
+    def _accelerate(self):
+        venv = ROOT / ".venv" / "Scripts" / "accelerate.exe"
+        return str(venv) if venv.exists() else "accelerate"
+
     def system_check(self):
         code = ("import sys,torch; print('Python:',sys.version); "
                 "print('PyTorch:',torch.__version__); "
@@ -161,7 +165,7 @@ class CalibriGUI(tk.Tk):
         out = Path(self.output.get()).expanduser()
         out.mkdir(parents=True, exist_ok=True)
         args = [
-            "accelerate", "launch", "scripts/inference.py",
+            self._accelerate(), "launch", "scripts/inference.py",
             "--config", item["config"],
             "--checkpoint_path", str(ROOT / item["checkpoint"]),
             "--prompt", prompt,
