@@ -165,7 +165,7 @@ class CalibriGUI(tk.Tk):
         out = Path(self.output.get()).expanduser()
         out.mkdir(parents=True, exist_ok=True)
         args = [
-            self._accelerate(), "launch", "scripts/inference.py",
+            self._python(), "-m", "accelerate.commands.launch", "scripts/inference.py",
             "--config", item["config"],
             "--checkpoint_path", str(ROOT / item["checkpoint"]),
             "--prompt", prompt,
