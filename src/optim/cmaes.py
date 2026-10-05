@@ -218,6 +218,8 @@ class CMAESTrainer:
                     total_scores[name] += s
             total_count += len(mini)
 
+        if total_count <= 0 or total_scores is None:
+            return {}
         return {name: float(score) / float(total_count) for name, score in total_scores.items()}
 
     def _eval_validation(self, x: np.ndarray, seed: int = 1234,
