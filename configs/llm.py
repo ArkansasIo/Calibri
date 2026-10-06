@@ -10,7 +10,7 @@ def get_config():
     """
     cfg = ConfigDict()
     cfg.enabled = True
-    cfg.name = "Calibri-LLM-100P"
+    cfg.name = "AetherForge-LLM-100P"
     cfg.architecture = "decoder_transformer"
     cfg.parameter_target = 100
     cfg.vocab_size = 11
