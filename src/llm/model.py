@@ -42,7 +42,7 @@ class DecoderBlock(nn.Module):
             ff = self.mlp(self.norm2(x))
         return x + ff, present, aux_loss
 
-class CalibriLLM(nn.Module):
+class AetherForgeLLM(nn.Module):
     """Development-scale decoder with GQA, RoPE, optional sparse MoE and KV cache.
 
     The 100T configuration remains a distributed architecture plan and is never
