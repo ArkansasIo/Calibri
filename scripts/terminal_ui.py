@@ -278,10 +278,10 @@ def llm_menu(settings):
     while True:
         header("LLM CONTROL", settings)
         choice = menu("Language model", [
-            ("1", "Interactive LLM chat"),
+            ("1", "Interactive Calibri LLM chat"),
             ("2", "Free Local LLM (no paid API)"),
-            ("2", "Single-prompt LLM"),
-            ("3", "Create checkpoint"),
+            ("3", "Single-prompt Calibri LLM"),
+            ("4", "Create checkpoint"),
             ("5", "Show default 100P configuration"),
             ("b", "Back"),
         ])
@@ -296,7 +296,7 @@ def llm_menu(settings):
             prompt = input("Prompt: ").strip()
             if prompt:
                 run_known(["scripts/llm.py", *prompt.split()])
-        elif choice == "3":
+        elif choice == "4":
             output = input("Checkpoint directory: ").strip()
             if output:
                 run_known(["scripts/llm_checkpoint.py", "--output", output])
@@ -304,7 +304,6 @@ def llm_menu(settings):
             from configs.llm import get_config
             wrapped(get_config())
         pause()
-
 
 def settings_menu(settings):
     while True:
