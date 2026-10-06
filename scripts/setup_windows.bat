@@ -3,7 +3,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 cd /d "%~dp0.."
 
 echo ==========================================
-echo Calibri Windows Setup / Repair
+echo AetherForge AI Windows Setup / Repair
 echo ==========================================
 echo.
 
