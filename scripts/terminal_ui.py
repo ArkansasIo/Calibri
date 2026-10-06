@@ -401,12 +401,13 @@ def main_menu(settings):
         header("MAIN MENU", settings)
         choice = menu("Control Center", [
             ("1", "AI Agent System"),
-            ("2", "LLM / Chat"),\n            ("3", "MiMoCode AI"),
-            ("3", "Calibration / Research"),
-            ("4", "System / Diagnostics"),
-            ("5", "Project / Developer Tools"),
-            ("6", "Settings"),
-            ("7", "Help / About"),
+            ("2", "LLM / Chat"),
+            ("3", "MiMoCode AI"),
+            ("4", "Calibration / Research"),
+            ("5", "System / Diagnostics"),
+            ("6", "Project / Developer Tools"),
+            ("7", "Settings"),
+            ("8", "Help / About"),
             ("q", "Exit"),
         ])
         if choice == "q":
@@ -416,14 +417,16 @@ def main_menu(settings):
         elif choice == "2":
             llm_menu(settings)
         elif choice == "3":
-            research_menu(settings)
+            mimo_menu(settings)
         elif choice == "4":
-            system_menu(settings)
+            research_menu(settings)
         elif choice == "5":
-            developer_menu(settings)
+            system_menu(settings)
         elif choice == "6":
-            settings_menu(settings)
+            developer_menu(settings)
         elif choice == "7":
+            settings_menu(settings)
+        elif choice == "8":
             header("HELP / ABOUT", settings)
             print("Calibri — diffusion calibration, LLM, and multi-agent research environment.")
             print("Standard-library terminal control center with safe project operations.")
