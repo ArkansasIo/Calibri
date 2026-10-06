@@ -5,7 +5,7 @@ def get_config():
 
     cfg.agent = ConfigDict()
     cfg.agent.enabled = True
-    cfg.agent.name = "Calibri-Orchestrator"
+    cfg.agent.name = "AetherForge-Orchestrator"
     cfg.agent.mode = "orchestrator"
     cfg.agent.max_steps = 32
     cfg.agent.timeout_seconds = 300
