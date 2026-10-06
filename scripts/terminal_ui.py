@@ -1,4 +1,4 @@
-"""Calibri interactive terminal control center."""
+"""AetherForge AI interactive terminal control center."""
 from __future__ import annotations
 
 import json
@@ -85,7 +85,7 @@ def header(title, settings):
     clear()
     line = "=" * width()
     print(color(line, CYAN))
-    print(color(" CALIBRI :: AI RESEARCH & AGENT CONTROL CENTER", BOLD + CYAN))
+    print(color(" AETHERFORGE AI :: RESEARCH & AGENT CONTROL CENTER", BOLD + CYAN))
     print(color(f" {title}", BOLD + WHITE))
     print(color(line, CYAN))
     if settings.get("show_timestamps", True):
@@ -164,7 +164,7 @@ def agent_chat(settings):
                 result = orchestrator.registry.get(selected).handler({"task": prompt})
                 result["routed_agent"] = selected
             log(f"agent={selected} task={prompt!r}")
-            print(color("\nCALIBRI >", GREEN))
+            print(color("\nAETHERFORGE >", GREEN))
             wrapped(json.dumps(result, indent=2, default=str))
         except Exception as exc:
             print(color(f"Agent error: {exc}", RED))
@@ -206,7 +206,7 @@ def mimo_menu(settings):
     while True:
         header("MIMOCODE AI", settings)
         choice = menu("MiMoCode integration", [
-            ("1", "Launch MiMoCode in Calibri"),
+            ("1", "Launch MiMoCode in AetherForge"),
             ("2", "Ask MiMoCode a one-shot question"),
             ("3", "Check MiMoCode installation"),
             ("4", "Installation instructions"),
@@ -294,7 +294,7 @@ def free_llm_menu(settings):
         elif choice == "3":
             run_known(["-c", "from src.llm.free_local import status; import pprint; pprint.pp(status())"])
         elif choice == "4":
-            print("Calibri Native 100P: built-in CPU smoke-test model.")
+            print("AetherForge Native 100P: built-in CPU smoke-test model.")
             print("llama.cpp: local GGUF inference on CPU/GPU.")
             print("Ollama: local model runtime and model manager.")
             print("No paid cloud inference is required for these backends.")
@@ -311,10 +311,10 @@ def llm_menu(settings):
     while True:
         header("LLM CONTROL", settings)
         choice = menu("Language model", [
-            ("1", "Interactive Calibri LLM chat"),
+            ("1", "Interactive AetherForge LLM chat"),
             ("2", "Free Local LLM (no paid API)"),
             ("3", "Local AI Platform / Models / Memory"),
-            ("4", "Single-prompt Calibri LLM"),
+            ("4", "Single-prompt AetherForge LLM"),
             ("5", "Create checkpoint"),
             ("6", "Show default 100P configuration"),
             ("b", "Back"),
