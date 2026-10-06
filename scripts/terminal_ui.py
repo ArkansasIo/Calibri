@@ -56,6 +56,7 @@ def defaults():
         "max_new_tokens": 64,
         "default_agent": "planner",
         "safe_mode": True,
+        "local_llm_backend": "llama_cpp",
     }
 
 
@@ -236,14 +237,52 @@ def mimo_menu(settings):
         pause()
 
 
+def free_llm_menu(settings):
+    while True:
+        header("FREE LOCAL LLM", settings)
+        choice = menu("No-paid-API local AI", [
+            ("1", "Free local LLM chat"),
+            ("2", "Switch llama.cpp / Ollama backend"),
+            ("3", "Check local LLM runtimes"),
+            ("4", "Local AI architecture"),
+            ("5", "Privacy / billing status"),
+            ("b", "Back"),
+        ])
+        if choice == "b":
+            return
+        if choice == "1":
+            backend = settings.get("local_llm_backend", "llama_cpp")
+            run_known(["scripts/free_llm.py", "--backend", backend])
+        elif choice == "2":
+            current = settings.get("local_llm_backend", "llama_cpp")
+            settings["local_llm_backend"] = "ollama" if current == "llama_cpp" else "llama_cpp"
+            save_settings(settings)
+            print("Backend:", settings["local_llm_backend"])
+        elif choice == "3":
+            run_known(["-c", "from src.llm.free_local import status; import pprint; pprint.pp(status())"])
+        elif choice == "4":
+            print("Calibri Native 100P: built-in CPU smoke-test model.")
+            print("llama.cpp: local GGUF inference on CPU/GPU.")
+            print("Ollama: local model runtime and model manager.")
+            print("No paid cloud inference is required for these backends.")
+        elif choice == "5":
+            print("Paid API key required: NO")
+            print("Subscription required: NO")
+            print("Cloud inference required: NO")
+            print("Internet is only needed to install/download a model.")
+            print("Once the model is local, inference can run offline.")
+        pause()
+
+
 def llm_menu(settings):
     while True:
         header("LLM CONTROL", settings)
         choice = menu("Language model", [
             ("1", "Interactive LLM chat"),
+            ("2", "Free Local LLM (no paid API)"),
             ("2", "Single-prompt LLM"),
             ("3", "Create checkpoint"),
-            ("4", "Show default 100P configuration"),
+            ("5", "Show default 100P configuration"),
             ("b", "Back"),
         ])
         if choice == "b":
@@ -252,6 +291,8 @@ def llm_menu(settings):
             run_known(["scripts/llm_chat.py", "--device", settings["chat_device"],
                        "--max-new-tokens", str(settings["max_new_tokens"])])
         elif choice == "2":
+            free_llm_menu(settings)
+        elif choice == "3":
             prompt = input("Prompt: ").strip()
             if prompt:
                 run_known(["scripts/llm.py", *prompt.split()])
@@ -259,7 +300,7 @@ def llm_menu(settings):
             output = input("Checkpoint directory: ").strip()
             if output:
                 run_known(["scripts/llm_checkpoint.py", "--output", output])
-        elif choice == "4":
+        elif choice == "5":
             from configs.llm import get_config
             wrapped(get_config())
         pause()
