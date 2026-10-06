@@ -1,1 +1,1 @@
-"""Calibri desktop GUI package."""
+"""AetherForge AI desktop GUI package."""
