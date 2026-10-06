@@ -3,7 +3,7 @@ from configs.llm import get_config
 from src.llm.distributed import build_parallel_plan, validate_parallel_plan
 
 def main():
-    p=argparse.ArgumentParser(description="Validate Calibri LLM distributed topology")
+    p=argparse.ArgumentParser(description="Validate AetherForge LLM distributed topology")
     p.add_argument("--world-size", type=int, default=None)
     a=p.parse_args()
     cfg=get_config()
