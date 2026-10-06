@@ -37,10 +37,10 @@ MODELS = {
     },
 }
 
-class CalibriGUI(tk.Tk):
+class AetherForgeGUI(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Calibri — Diffusion Calibration Studio")
+        self.title("AetherForge AI — Development & Calibration Studio")
         self.geometry("1120x760")
         self.minsize(900, 620)
         self.configure(bg="#07111f")
@@ -51,7 +51,7 @@ class CalibriGUI(tk.Tk):
         self._build_style()
         self._build_ui()
         self.after(100, self._drain_log)
-        self._write("Calibri GUI ready. Select a model and run a system check.")
+        self._write("AetherForge AI ready. Select a model and run a system check.")
 
     def _build_style(self):
         style = ttk.Style(self)
