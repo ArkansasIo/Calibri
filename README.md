@@ -1,160 +1,419 @@
-<h1 align="center"> Calibri:<br>Enhancing Diffusion Transformers via Parameter-Efficient Calibration </h1>
+# AetherForge AI
 
-<div align="center">
-  <a href='https://arxiv.org/abs/2603.24800v1'><img src='https://img.shields.io/badge/ArXiv-red?logo=arxiv'></a>  &nbsp;
-  <a href='https://v-gen-ai.github.io/Calibri-page/'><img src='https://img.shields.io/badge/Visualization-green?logo=github'></a> &nbsp;
-  <a href='https://huggingface.co/collections/v-gen-ai/calibri-models'><img src='https://img.shields.io/badge/Model-blue?logo=huggingface'></a> &nbsp; 
-  <!-- <a href='https://huggingface.co/spaces/jieliu/SD3.5-M-Flow-GRPO'><img src='https://img.shields.io/badge/Demo-blue?logo=huggingface'></a> &nbsp; -->
-</div>
+A local-first AI development and research platform for software, games, mathematics, and creative computing.
 
-<br>
+AetherForge AI is the new user-facing name for this repository. The Git repository remains ArkansasIo/Calibri so the original research implementation and history are preserved.
 
-> **Calibri** is a parameter-efficient approach that optimally calibrates Diffusion Transformer (DiT) components to elevate generative quality. By framing DiT calibration as a black-box reward optimization problem solved using the CMA-ES evolutionary algorithm, Calibri modifies just **~100 parameters**. This lightweight calibration not only consistently improves generation quality across various models but also significantly reduces the required inference steps (NFE) while maintaining high-quality outputs.
+## Mission
 
-# 📄 Changelog
+AetherForge combines parameter-efficient diffusion calibration with a local AI development environment. It is designed to connect local language models, specialist agents, coding assistants, mathematics, game engines, IDEs, programming languages, and research tools.
 
- <details open>
-<summary><strong>2026-04-13</strong></summary>
+Core goals:
 
+- local-first AI inference;
+- no paid API requirement for local inference;
+- game-development assistance;
+- multi-language software engineering;
+- mathematics and scientific computing;
+- diffusion-model research;
+- safe agent orchestration;
+- Windows desktop and terminal workflows;
+- extensible integrations rather than vendor lock-in.
 
-* Released **open calibration weights** for **FLUX.1-dev** and **Qwen-Image**.
-* The calibrated checkpoints are now publicly available for inference at `weights/`.
+## Product identity
 
-</details>
+| Item | Value |
+|---|---|
+| Product | AetherForge AI |
+| Repository | ArkansasIo/Calibri |
+| License | MIT |
+| Python | 3.10 through 3.12 |
+| Local AI | llama.cpp, Ollama, native development LLM |
+| Diffusion | PyTorch, Diffusers, Accelerate |
+| Optimization | CMA-ES |
+| Game development | Unreal Engine 5 and extensible engine adapters |
 
-<details open>
-<summary><strong>2026-03-24</strong></summary>
+The historical name Calibri remains in research-specific code, configuration names, paper attribution, and compatibility paths where changing identifiers would break the original implementation.
 
-* Official release of **Calibri** codebase! Code supports CMA-ES calibration for **FLUX**, **Stable Diffusion 3.5**, and **Qwen-Image**.
+## Platform architecture
 
-</details>
+    AETHERFORGE AI
+           |
+    +------+-------+----------------+
+    |              |                |
+  LOCAL AI       AGENTS          RESEARCH
+    |              |                |
+ llama.cpp     Planner          Diffusion
+ Ollama        Researcher      CMA-ES
+ Native LLM    Architect       Rewards
+ GGUF          Trainer         FLUX
+ Memory        Evaluator       SD3
+               Optimizer       Qwen
+               Diagnostics
+    |              |                |
+    +--------------+----------------+
+                   |
+          DEVELOPMENT BRIDGE
+                   |
+    +------+-------+-------+--------+
+    |      |       |       |        |
+   UE5   Unity   Godot   Bevy    Custom
+    |      |       |       |        |
+   C++   C#      GDScript Rust    Any
+ Blueprint
+ Python
+                   |
+             PROGRAMMING
+                   |
+ C/C++ C# Rust Java Python JS/TS Go Swift Kotlin
+ Lua GDScript PHP Ruby Dart SQL HLSL GLSL Assembly
+                   |
+              MATHEMATICS
+                   |
+       Local math + Wolfram|Alpha
 
+## Free local AI
 
-# 🤗 Supported Models & Rewards
+AetherForge does not require a paid cloud API for its local AI path.
 
-Calibri optimizes text-to-image models by maximizing human-preference rewards. It currently supports the following DiT architectures and Reward Models:
+No subscription is required.
+No paid API account is required.
+No cloud inference is required.
+No API usage billing is required.
 
-| Task | Model | NFE with Calibri |
-| -------- | -------- | -------- |
-| Text-to-Image | [FLUX.1-dev](https://huggingface.co/black-forest-labs/FLUX.1-dev) | **15** |
-| Text-to-Image | [stable-diffusion-3.5-medium](https://huggingface.co/stabilityai/stable-diffusion-3.5-medium) | **30** |
-| Text-to-Image | [stable-diffusion-3.5-large](https://huggingface.co/stabilityai/stable-diffusion-3.5-large) | **30** |
-| Text-to-Image | [Qwen-Image](https://huggingface.co/Qwen/Qwen-Image) | **30** |
+LLMs still use internal tokens to represent text. No-token in the product description means no paid API-token billing system, not that the mathematical concept of tokens is removed from language models.
 
+### Local backends
 
-**Supported Reward Models:**
-* **[HPSv3](https://github.com/tgxs002/HPSv3)**: Human Preference Score v3.
-* **[Q-Align](https://github.com/Q-Future/Q-Align)**: MLLM-based visual quality scoring.
-* **[PickScore](https://huggingface.co/yuvalkirstain/PickScore_v1)**: CLIP-based aesthetic scoring model.
-* **[ImageReward](https://github.com/THUDM/ImageReward)**: General human preference reward.
+llama.cpp provides local GGUF inference on supported CPU/GPU hardware.
 
+Ollama provides a convenient local model runtime and model manager.
 
-# 🚀 Quick start
+The native AetherForge LLM provides a small development/reference transformer for testing the LLM infrastructure.
 
-## Environment Set Up
-The framework is built with [uv](https://github.com/astral-sh/uv) — an extremely fast Python package and project manager. Installation guide is at uv [docs](https://docs.astral.sh/uv/getting-started/installation/)
+### Windows setup
 
-**1. Clone the repository**
-```bash
-git clone https://github.com/your-username/Calibri.git
-cd Calibri
-```
+    cd "C:\Users\Shadow\Music\New folder\Calibri"
+    setup_free_llm.bat
 
-**2. Setup environment and install dependencies**
-```bash
-uv sync
-source .venv/bin/activate
-```
+Then:
 
-## Reward Preparation
+    launch_terminal_ui.bat
 
-To train using HPSv3 or Q-Align rewards you need to start the reward servers before running the main training script.
+Choose:
 
-HPSv3 server:
+    LLM / Chat
+      -> Free Local LLM
 
-```bash
-uv run src/metrics/hpsv3_server.py --device cuda:0
-```
+## Local model manager
 
-Q-Align server:
-```bash
-uv run src/metrics/qalign_server.py --device cuda:1
-```
+Local GGUF models are discovered under:
 
-## Start Training
-You can easily start the calibration process using Accelerate. The algorithm utilizes the CMA-ES evolutionary strategy to find the optimal scaling parameters.
+    models/
 
-```bash
-accelerate launch --num_processes 2 scripts/train.py --config configs/calibri.py:cmaes_hpsv3_flux_layer
-```
+The manager can list models, show recommended models, inspect runtime availability, and report model sizes.
 
-### ⚙️ Hyperparameters & Granularity
+Commands:
 
-Calibri is designed to be highly flexible. You can easily customize the target DiT backbone, reward models, and optimization hyperparameters directly via `configs/calibri.py`.
+    python scripts/local_ai.py status
+    python scripts/local_ai.py models
+    python scripts/local_ai.py recommended
 
-A core feature of our framework is the ability to define the **search space granularity**. As described in our paper, Calibri supports three distinct levels of granularity for internal-layer calibration, allowing you to balance parameter efficiency and generation quality:
+## Persistent local memory
 
-* **Block Scaling**: Uniformly adjusts the outputs of Attention and MLP layers within the same block (~57 parameters).
-* **Layer Scaling**: Adjusts individual layers within a block using distinct coefficients (~76 parameters).
-* **Gate Scaling**: Specialized calibration for visual and textual tokens processed through distinct gates in MM-DiT architectures (~114 parameters).
+AetherForge can store local development memories under:
 
-### 📈 Monitoring
-Track your calibration progress, reward metrics, and generated image samples in real-time with tensorboard:
+    .calibri/memory.json
 
-```bash
-tensorboard --logdir=<exp_logdir>
-```
+Examples:
 
-## Inference
+    python scripts/local_ai.py remember "Use Unreal C++ for the combat server."
+    python scripts/local_ai.py memory "combat server"
 
-We provide a script to easily run inference for custom prompts or evaluate the calibrated checkpoints across your validation datasets.
+This memory is local project data. It is not automatically uploaded to a cloud AI service.
 
-**1. Custom Prompt Generation**
+## Multi-agent system
 
-For Flux:
+The agent framework contains specialist roles:
 
-```bash
-accelerate launch scripts/inference.py \
-    --config configs/calibri.py:cmaes_hpsv3_flux_gates \
-    --checkpoint_path ./weights/flux_gates.json \
-    --prompt "a futuristic city at sunset" \
-    --save_dir ./outputs/custom_gens
-```
+- Planner
+- Researcher
+- Architect
+- Trainer
+- Evaluator
+- Optimizer
+- Diagnostics
 
-For Qwen:
-```bash
-accelerate launch scripts/inference.py \
-    --config configs/calibri.py:cmaes_qwen_clean_hpsv3_2models_cfg \
-    --checkpoint_path ./weights/qwenimage.json \
-    --prompt "a futuristic city at sunset" \
-    --save_dir ./outputs/custom_gens
-```
+The terminal control center supports agent selection, routing, interactive chat, approval settings, and safety controls.
 
-This mode generates an image for your specific text prompt. It bypasses metrics calculation and outputs the result directly to `--save_dir`. 
+The default interface does not expose unrestricted destructive shell execution.
 
-**2. Data Evaluation**
-```bash
-accelerate launch scripts/inference.py \
-    --config configs/calibri.py:cmaes_hpsv3_flux_gates \
-    --checkpoint_path ./weights/flux_gates.json \
-    --save_dir ./outputs/val_evaluation
-```
-If `--prompt` is not provided, the script runs a full evaluation on the validation dataset specified in your config (`cfg.data.val_dataset`). Distributed across multiple GPUs via `accelerate`, it generates all images and computes the human-preference reward metrics.
+## MiMoCode
 
-# 🤗 Acknowledgements
+AetherForge integrates MiMoCode as an external terminal-native coding assistant.
 
-This repository is based on [diffusers](https://github.com/huggingface/diffusers/), [accelerate](https://github.com/huggingface/accelerate) and [flow_grpo](https://github.com/yifan123/flow_grpo/tree/main).
-We thank them for their contributions to the community!!!
+The integration deliberately keeps the external project separate from the AetherForge source tree.
 
-# ⭐Citation
-If you find Calibri useful for your research or projects, we would greatly appreciate it if you could cite the following paper:
+Windows setup:
 
-```bibtex
-@article{tokhchukov2026calibri,
-  title={Calibri: Enhancing Diffusion Transformers via Parameter-Efficient Calibration}, 
-  author={Tokhchukov, Danil and Mirzoeva, Aysel and Kuznetsov, Andrey and Sobolev, Konstantin},
-  journal={arXiv preprint arXiv:2603.24800},
-  year={2026},
-}
-```
-\n## 🧰 Visual Studio Code\n\nCalibri can be developed and debugged directly in VS Code on Windows.\n\n1. Install Python 3.11 and the VS Code Python extension.\n2. Open the repository folder in VS Code.\n3. Create/sync the environment with `uv sync`.\n4. Select `.venv\\Scripts\\python.exe` as the Python interpreter.\n5. Open **Run and Debug** and select **Calibri GUI**.\n\nThe repository includes `.vscode/settings.json` and `.vscode/launch.json`.\nThe **Calibri Inference — FLUX** debug profile runs the inference module through Accelerate.\n\n### Diagnostics\n\nRun this from the VS Code terminal:\n\n```powershell\npython -m compileall gui scripts src configs\npython -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"CPU\")"\n```\n\n### Recommended Windows setup\n\n```powershell\nuv python install 3.11\nuv venv --python 3.11\nuv sync\n.\\.venv\\Scripts\\Activate.ps1\npython -m compileall gui scripts src configs\n```\n\nThe GUI uses the active `.venv` Python interpreter and invokes Accelerate through `python -m accelerate.commands.launch`, avoiding a separate global `accelerate.exe` PATH dependency.\n
+    setup_mimocode.bat
+
+Then:
+
+    launch_terminal_ui.bat
+
+Choose:
+
+    MiMoCode AI
+
+## Unreal Engine 5
+
+AetherForge includes an Unreal Engine 5 plugin foundation for development workflows.
+
+Location:
+
+    integrations/unreal5/
+
+The adapter targets:
+
+- C++;
+- Blueprint;
+- Unreal Editor Python;
+- project inspection;
+- future AI-assisted generation;
+- compiler/build diagnostics.
+
+The AI runtime should normally remain outside the packaged shipping game. The UE plugin is a development bridge, not an instruction to embed a large model into every game executable.
+
+## Other game engines
+
+The integration architecture is designed for:
+
+| Engine | Languages |
+|---|---|
+| Unreal Engine 5 | C++, Blueprint, Python |
+| Unity | C#, HLSL, ShaderLab |
+| Godot | GDScript, C#, C++ |
+| Bevy | Rust |
+| Stride | C# |
+| MonoGame | C# |
+| libGDX | Java, Kotlin |
+| Defold | Lua |
+| GameMaker | GML |
+| CryEngine | C++, C# |
+| Custom engines | Project-defined |
+
+The engine bridge is intended to inspect project structure, identify the engine and language, and provide the correct development context to the local AI.
+
+## Programming languages
+
+The language registry covers major ecosystems including:
+
+C, C++, C#, Rust, Java, Kotlin, Python, JavaScript, TypeScript, Go, Swift, Objective-C, Lua, GDScript, PHP, Ruby, Dart, Haskell, OCaml, Scala, R, Julia, Fortran, Assembly, SQL, HTML, CSS, GLSL, HLSL, ShaderLab, GML, Solidity, and WebAssembly.
+
+The registry is extensible. AetherForge does not attempt to replace the compiler, linker, debugger, package manager, or official IDE for each language.
+
+## IDE support
+
+The integration layer recognizes common development environments including:
+
+Visual Studio, VS Code, JetBrains IDEs, CLion, Rider, IntelliJ IDEA, PyCharm, Android Studio, Xcode, Eclipse, NetBeans, Neovim, Vim, Emacs, Sublime Text, Code::Blocks, and Qt Creator.
+
+The intended workflow is:
+
+    IDE
+      |
+      v
+    AetherForge AI
+      |
+      +--> local LLM
+      +--> agents
+      +--> project analysis
+      +--> compiler/build diagnostics
+      +--> mathematics
+      +--> game-engine bridge
+
+## Mathematics and Wolfram|Alpha
+
+AetherForge includes a Wolfram|Alpha integration boundary for advanced mathematical queries.
+
+Configure credentials outside source control:
+
+    WOLFRAM_APP_ID=your-app-id
+
+Never commit an App ID or other secret.
+
+The intended workflow is:
+
+    Natural-language problem
+             |
+             v
+      AetherForge reasoning
+             |
+       +-----+------+
+       |            |
+    Local math   Wolfram|Alpha
+       |            |
+       +-----+------+
+             |
+     explanation / equation /
+     algorithm / source code
+
+This makes mathematical reasoning useful for programming and game-development tasks.
+
+## Original diffusion research
+
+The repository retains the original parameter-efficient diffusion research implementation.
+
+Supported model families include:
+
+- FLUX.1-dev
+- Stable Diffusion 3.5 Medium
+- Stable Diffusion 3.5 Large
+- Qwen-Image
+
+The original calibration approach uses CMA-ES to optimize a small calibration parameter set rather than retraining an entire diffusion model.
+
+### Environment
+
+Recommended Python version:
+
+    Python 3.11
+
+Windows:
+
+    uv python install 3.11
+    uv venv --python 3.11
+    uv sync
+    .\.venv\Scripts\Activate.ps1
+
+Compile check:
+
+    python -m compileall gui scripts src configs
+
+### Training
+
+Example:
+
+    accelerate launch --num_processes 2 scripts/train.py --config configs/calibri.py:cmaes_hpsv3_flux_layer
+
+### FLUX inference
+
+    accelerate launch scripts/inference.py ^
+      --config configs/calibri.py:cmaes_hpsv3_flux_gates ^
+      --checkpoint_path .\weights\flux_gates.json ^
+      --prompt "a futuristic city at sunset" ^
+      --save_dir .\outputs\custom_gens
+
+### Qwen-Image inference
+
+    accelerate launch scripts/inference.py ^
+      --config configs/calibri.py:cmaes_qwen_clean_hpsv3_2models_cfg ^
+      --checkpoint_path .\weights\qwenimage.json ^
+      --prompt "a futuristic city at sunset" ^
+      --save_dir .\outputs\custom_gens
+
+## Windows GUI
+
+The existing compatibility launcher is:
+
+    launch_calibri_gui.bat
+
+The product identity shown to users is being migrated to AetherForge AI while the historical launcher remains available.
+
+The GUI provides:
+
+- environment diagnostics;
+- setup and repair;
+- local AI controls;
+- diffusion inference;
+- process control;
+- output management;
+- Windows executable build support.
+
+## Terminal Control Center
+
+Launch:
+
+    launch_terminal_ui.bat
+
+Main sections:
+
+    1  AI Agent System
+    2  LLM / Chat
+    3  MiMoCode AI
+    4  Calibration / Research
+    5  System / Diagnostics
+    6  Project / Developer Tools
+    7  Settings
+    8  Help / About
+    q  Exit
+
+## Safety
+
+AetherForge is local-first and designed to keep credentials out of source code.
+
+Never commit:
+
+- API keys;
+- Wolfram App IDs;
+- cloud credentials;
+- database passwords;
+- SSH keys;
+- private certificates;
+- provider secrets.
+
+Local model inference can remain offline after the runtime and model files have been obtained.
+
+## Large-model configurations
+
+The repository contains experimental distributed configurations for very large sparse models.
+
+The 100T configuration is an architecture and distributed-training planning specification. It does not allocate a 100-trillion-parameter model on a normal desktop.
+
+Real deployment requires suitable distributed hardware, memory, networking, checkpoint sharding, and parallelism.
+
+## Project layout
+
+    configs/              Configuration
+    gui/                  Desktop GUI
+    integrations/         Game-engine and external integrations
+    scripts/              CLI tools
+    src/agents/           Multi-agent framework
+    src/integrations/     Engine, language and mathematics bridges
+    src/llm/              Local LLM subsystem
+    src/metrics/          Reward systems
+    src/models/           Diffusion models
+    src/optim/            Calibration algorithms
+    weights/              Calibration checkpoints
+    models/               Local GGUF model storage
+    .calibri/             Local settings and memory
+    tests/                Tests
+
+## Development checks
+
+Run:
+
+    python -m compileall gui scripts src configs
+    python scripts/llm_preflight.py
+    python scripts/local_ai.py status
+
+CUDA diagnostic:
+
+    python -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
+
+## Naming and compatibility
+
+AetherForge AI is the new product name.
+
+The repository path, historical research identifiers, configuration names, and compatibility launchers may still contain Calibri. These are retained deliberately to avoid breaking the original research implementation and existing workflows.
+
+## License
+
+MIT License. See LICENSE.
+
+## Attribution
+
+The original diffusion-calibration research and paper attribution remain preserved in the repository.
+
+AetherForge AI is the broader development-platform identity built around that research foundation.
