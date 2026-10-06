@@ -18,7 +18,7 @@ def main():
     a = p.parse_args()
 
     c = get_config()
-    print("Calibri LLM preflight")
+    print("AetherForge LLM preflight")
     print("torch:", torch.__version__, "cuda:", torch.cuda.is_available())
     print("target parameters:", c.parameter_target)
     print(
