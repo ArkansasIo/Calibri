@@ -314,9 +314,9 @@ def llm_menu(settings):
             ("1", "Interactive Calibri LLM chat"),
             ("2", "Free Local LLM (no paid API)"),
             ("3", "Local AI Platform / Models / Memory"),
-            ("3", "Single-prompt Calibri LLM"),
-            ("4", "Create checkpoint"),
-            ("5", "Show default 100P configuration"),
+            ("4", "Single-prompt Calibri LLM"),
+            ("5", "Create checkpoint"),
+            ("6", "Show default 100P configuration"),
             ("b", "Back"),
         ])
         if choice == "b":
