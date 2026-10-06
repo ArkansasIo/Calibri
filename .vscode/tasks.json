@@ -18,6 +18,14 @@
       "problemMatcher": []
     },
     {
+      "label": "Calibri: Terminal Control Center",
+      "type": "shell",
+      "command": "python",
+      "args": ["scripts/terminal_ui.py"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
       "label": "Calibri: LLM Preflight",
       "type": "shell",
       "command": "python",
