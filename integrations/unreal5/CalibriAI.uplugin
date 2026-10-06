@@ -1,0 +1,12 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "0.1.0",
+  "FriendlyName": "Calibri AI",
+  "Description": "Local AI development bridge for Calibri, UE5 C++/Blueprint/Python workflows.",
+  "Category": "AI",
+  "EnabledByDefault": false,
+  "Modules": [
+    { "Name": "CalibriAI", "Type": "Editor", "LoadingPhase": "Default" }
+  ]
+}
