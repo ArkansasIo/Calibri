@@ -2,21 +2,28 @@ import math
 import torch
 import torch.nn as nn
 
+
 def apply_rope(q, k, theta=500000.0, offset=0):
+    """Apply rotary position embeddings to query/key tensors."""
     length = q.size(-2)
     dim = q.size(-1)
     half = dim // 2
+    if half == 0:
+        return q, k
     pos = torch.arange(offset, offset + length, device=q.device, dtype=torch.float32)
     inv = 1.0 / (theta ** (torch.arange(0, half, device=q.device, dtype=torch.float32) / half))
     angles = pos[:, None] * inv[None, :]
     cos, sin = angles.cos().to(q.dtype), angles.sin().to(q.dtype)
+
     def rotate(x):
-        a, b = x[..., :half], x[..., half:2*half]
-        return torch.cat((a * cos - b * sin, a * sin + b * cos, x[..., 2*half:]), dim=-1)
+        a, b = x[..., :half], x[..., half:2 * half]
+        return torch.cat((a * cos - b * sin, a * sin + b * cos, x[..., 2 * half:]), dim=-1)
+
     return rotate(q), rotate(k)
 
+
 class GQAAttention(nn.Module):
-    """Grouped-query attention using PyTorch SDPA and RoPE."""
+    """Grouped-query attention with RoPE and incremental KV caching."""
     def __init__(self, hidden_size, num_heads, num_kv_heads, rope_theta=500000.0):
         super().__init__()
         if hidden_size % num_heads:
@@ -45,8 +52,11 @@ class GQAAttention(nn.Module):
         repeat = self.num_heads // self.num_kv_heads
         k_attn = k.repeat_interleave(repeat, dim=1)
         v_attn = v.repeat_interleave(repeat, dim=1)
+        # With cached keys, the query attends to all previous positions plus the
+        # new token. A triangular causal mask over the enlarged K/V is incorrect.
         causal = past_key_value is None
-        y = torch.nn.functional.scaled_dot_product_attention(q, k_attn, v_attn, is_causal=causal)
+        y = torch.nn.functional.scaled_dot_product_attention(
+            q, k_attn, v_attn, is_causal=causal
+        )
         y = y.transpose(1, 2).reshape(b, s, -1)
-        out = self.o_proj(y)
-        return out, ((k, v) if use_cache else None)
+        return self.o_proj(y), ((k, v) if use_cache else None)
