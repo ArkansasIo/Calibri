@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from .losses import causal_lm_loss
 from .attention import GQAAttention
 from .moe import TopKMoE
 
@@ -69,11 +70,7 @@ class AetherForgeLLM(nn.Module):
         logits = self.lm_head(self.norm(x))
         loss = None
         if labels is not None:
-            loss = F.cross_entropy(
-                logits[:, :-1].contiguous().view(-1, logits.size(-1)),
-                labels[:, 1:].contiguous().view(-1),
-                ignore_index=-100,
-            )
+            loss = causal_lm_loss(logits, labels)
         return {"logits": logits, "loss": loss, "aux_loss": aux_loss,
                 "past_key_values": presents}
 
