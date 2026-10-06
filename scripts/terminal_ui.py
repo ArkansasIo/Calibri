@@ -201,6 +201,41 @@ def agents_menu(settings):
             pause()
 
 
+def mimo_menu(settings):
+    while True:
+        header("MIMOCODE AI", settings)
+        choice = menu("MiMoCode integration", [
+            ("1", "Launch MiMoCode in Calibri"),
+            ("2", "Ask MiMoCode a one-shot question"),
+            ("3", "Check MiMoCode installation"),
+            ("4", "Installation instructions"),
+            ("5", "MiMoCode capabilities"),
+            ("b", "Back"),
+        ])
+        if choice == "b":
+            return
+        from scripts.mimo_code import install_hint, one_shot, interactive, status
+        if choice == "1":
+            print("Starting MiMoCode in:", ROOT)
+            interactive()
+        elif choice == "2":
+            prompt = input("MiMoCode prompt: ").strip()
+            if prompt:
+                one_shot(prompt)
+        elif choice == "3":
+            info = status()
+            print("Installed:", info["installed"])
+            print("Executable:", info["executable"] or "not found")
+            print("Project:", info["repository"])
+        elif choice == "4":
+            print(install_hint())
+        elif choice == "5":
+            print("MiMoCode is a terminal-native AI coding assistant.")
+            print("It can work with project files, coding tasks, Git, agents, memory,")
+            print("and provider/model configuration through its own TUI.")
+        pause()
+
+
 def llm_menu(settings):
     while True:
         header("LLM CONTROL", settings)
@@ -366,7 +401,7 @@ def main_menu(settings):
         header("MAIN MENU", settings)
         choice = menu("Control Center", [
             ("1", "AI Agent System"),
-            ("2", "LLM / Chat"),
+            ("2", "LLM / Chat"),\n            ("3", "MiMoCode AI"),
             ("3", "Calibration / Research"),
             ("4", "System / Diagnostics"),
             ("5", "Project / Developer Tools"),
