@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "calibri"
+name = "aetherforge-ai"
 version = "0.1.0"
-description = "Official implementation of the paper Calibri: Enhancing Diffusion Transformers via Parameter-Efficient Calibration"
+description = "AetherForge AI — local AI development platform, diffusion calibration, agents, game-engine integrations, and research tooling"
 readme = "README.md"
 requires-python = ">=3.10, <3.13"
 license = { text = "MIT" }
