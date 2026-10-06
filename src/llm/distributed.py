@@ -1,4 +1,4 @@
-"""Distributed runtime helpers for Calibri's large-model LLM plans.
+"""Distributed runtime helpers for AetherForge large-model LLM plans.
 
 These helpers configure process groups and validate the requested parallel topology.
 They do not allocate a 100T model on a single device.
