@@ -1,4 +1,4 @@
-"""Portable game-engine integration protocol for Calibri local AI."""
+"""Portable game-engine integration protocol for AetherForge AI."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ SUPPORTED_ENGINES = {
 
 def detect_engine(project: str | Path) -> EngineProject:
     root = Path(project)
-    if (root / "*.uproject").exists() or list(root.glob("*.uproject")):
+    if list(root.glob("*.uproject")):
         return EngineProject("unreal5", str(root), "C++")
     if (root / "ProjectSettings" / "ProjectVersion.txt").exists():
         return EngineProject("unity", str(root), "C#")
