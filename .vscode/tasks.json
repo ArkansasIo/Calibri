@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Calibri: Sync Environment",
+      "type": "shell",
+      "command": "uv",
+      "args": ["sync"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
+      "label": "Calibri: Compile Check",
+      "type": "shell",
+      "command": "python",
+      "args": ["-m", "compileall", "gui", "scripts", "src", "configs"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
+      "label": "Calibri: LLM Preflight",
+      "type": "shell",
+      "command": "python",
+      "args": ["scripts/llm_preflight.py"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
+      "label": "Calibri: 100P LLM Chat",
+      "type": "shell",
+      "command": "python",
+      "args": ["scripts/llm_chat.py", "--device", "cpu"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    }
+  ]
+}
