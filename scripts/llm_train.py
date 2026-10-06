@@ -4,7 +4,7 @@ from configs.llm import get_config
 from src.llm.distributed import init_process_group, build_parallel_plan, validate_parallel_plan
 
 def main():
-    p=argparse.ArgumentParser(description="Calibri distributed LLM training launcher")
+    p=argparse.ArgumentParser(description="AetherForge distributed LLM training launcher")
     p.add_argument("--backend", default=None)
     p.add_argument("--validate-only", action="store_true")
     a=p.parse_args()
@@ -17,7 +17,7 @@ def main():
         return
     init_process_group(a.backend)
     rank=torch.distributed.get_rank()
-    print(f"Calibri LLM distributed runtime initialized: rank={rank}, world={world}")
+    print(f"AetherForge LLM distributed runtime initialized: rank={rank}, world={world}")
     if rank == 0:
         print("Model construction/training must be supplied with a distributed-safe checkpoint and optimizer.")
 if __name__=="__main__":
