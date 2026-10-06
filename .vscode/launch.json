@@ -11,6 +11,35 @@
       "justMyCode": true
     },
     {
+      "name": "Calibri LLM — 100P Chat",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}\\scripts\\llm_chat.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["--device", "cpu"]
+    },
+    {
+      "name": "Calibri LLM — 100P Preflight",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}\\scripts\\llm_preflight.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Calibri LLM — Training",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}\\scripts\\llm_train.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["--config", "configs/llm.py"]
+    },
+    {
       "name": "Calibri Inference — FLUX",
       "type": "debugpy",
       "request": "launch",
