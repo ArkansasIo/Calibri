@@ -237,6 +237,39 @@ def mimo_menu(settings):
         pause()
 
 
+def local_ai_menu(settings):
+    while True:
+        header("LOCAL AI PLATFORM", settings)
+        choice = menu("Offline AI tools", [
+            ("1", "Local runtime status"),
+            ("2", "List downloaded GGUF models"),
+            ("3", "Recommended free models"),
+            ("4", "Remember information"),
+            ("5", "Search local memory"),
+            ("6", "Launch free local chat"),
+            ("b", "Back"),
+        ])
+        if choice == "b":
+            return
+        if choice == "1":
+            run_known(["scripts/local_ai.py", "status"])
+        elif choice == "2":
+            run_known(["scripts/local_ai.py", "models"])
+        elif choice == "3":
+            run_known(["scripts/local_ai.py", "recommended"])
+        elif choice == "4":
+            value = input("Memory: ").strip()
+            if value:
+                run_known(["scripts/local_ai.py", "remember", value])
+        elif choice == "5":
+            value = input("Search: ").strip()
+            if value:
+                run_known(["scripts/local_ai.py", "memory", value])
+        elif choice == "6":
+            free_llm_menu(settings)
+        pause()
+
+
 def free_llm_menu(settings):
     while True:
         header("FREE LOCAL LLM", settings)
@@ -280,6 +313,7 @@ def llm_menu(settings):
         choice = menu("Language model", [
             ("1", "Interactive Calibri LLM chat"),
             ("2", "Free Local LLM (no paid API)"),
+            ("3", "Local AI Platform / Models / Memory"),
             ("3", "Single-prompt Calibri LLM"),
             ("4", "Create checkpoint"),
             ("5", "Show default 100P configuration"),
@@ -293,14 +327,16 @@ def llm_menu(settings):
         elif choice == "2":
             free_llm_menu(settings)
         elif choice == "3":
+            local_ai_menu(settings)
+        elif choice == "4":
             prompt = input("Prompt: ").strip()
             if prompt:
                 run_known(["scripts/llm.py", *prompt.split()])
-        elif choice == "4":
+        elif choice == "5":
             output = input("Checkpoint directory: ").strip()
             if output:
                 run_known(["scripts/llm_checkpoint.py", "--output", output])
-        elif choice == "5":
+        elif choice == "6":
             from configs.llm import get_config
             wrapped(get_config())
         pause()
