@@ -1,4 +1,4 @@
-"""Free local LLM backends for Calibri.
+"""Free local LLM backends for AetherForge AI.
 
 This module deliberately uses local inference only. No cloud API key, account,
 subscription, or usage-token billing is required. The model still has an
@@ -50,15 +50,13 @@ def backends() -> dict[str, dict[str, object]]:
 
 
 def llama_chat(prompt: str, model: str = "ggml-org/Qwen3.5-0.8B-GGUF") -> str:
-    command = find_command("llama")
-    if not command:
-        command = find_command("llama-cli")
+    command = find_command("llama-cli", "llama")
     if not command:
         raise RuntimeError(
-            "llama.cpp is not installed. Install a llama.cpp binary and put it on PATH."
+            "llama.cpp is not installed. Install llama-cli and put it on PATH."
         )
     result = subprocess.run(
-        [command, "cli", "-hf", model, "-p", prompt],
+        ([command, "-hf", model, "-p", prompt] if Path(command).stem.lower() == "llama-cli" else [command, "cli", "-hf", model, "-p", prompt]),
         cwd=ROOT,
         text=True,
         capture_output=True,
