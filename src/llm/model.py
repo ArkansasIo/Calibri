@@ -43,11 +43,7 @@ class DecoderBlock(nn.Module):
         return x + ff, present, aux_loss
 
 class AetherForgeLLM(nn.Module):
-    """Development-scale decoder with GQA, RoPE, optional sparse MoE and KV cache.
-
-    The 100T configuration remains a distributed architecture plan and is never
-    materialized by this reference class automatically.
-    """
+    """Development-scale decoder with GQA, RoPE, optional sparse MoE and KV cache."""
     def __init__(self, cfg: ModelConfig):
         super().__init__()
         self.config = cfg
@@ -57,6 +53,10 @@ class AetherForgeLLM(nn.Module):
         self.lm_head = nn.Linear(cfg.hidden_size, cfg.vocab_size, bias=True)
 
     def forward(self, input_ids, labels=None, past_key_values=None, use_cache=False):
+        if input_ids.ndim != 2:
+            raise ValueError("input_ids must have shape [batch, sequence]")
+        if input_ids.dtype != torch.long:
+            input_ids = input_ids.long()
         x = self.embed(input_ids)
         presents = [] if use_cache else None
         aux_loss = x.new_zeros(())
@@ -69,7 +69,13 @@ class AetherForgeLLM(nn.Module):
         logits = self.lm_head(self.norm(x))
         loss = None
         if labels is not None:
-            loss = F.cross_entropy(logits[:, :-1].contiguous().view(-1, logits.size(-1)),
-                                   labels[:, 1:].contiguous().view(-1))
+            loss = F.cross_entropy(
+                logits[:, :-1].contiguous().view(-1, logits.size(-1)),
+                labels[:, 1:].contiguous().view(-1),
+                ignore_index=-100,
+            )
         return {"logits": logits, "loss": loss, "aux_loss": aux_loss,
                 "past_key_values": presents}
+
+# Backward-compatible import name for existing Calibri integrations.
+CalibriLLM = AetherForgeLLM
