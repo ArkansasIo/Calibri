@@ -1,4 +1,4 @@
-from .model import CalibriLLM, ModelConfig
+from .model import AetherForgeLLM, ModelConfig
 from .tokenizer import SimpleTokenizer
 from .generation import generate
 from .moe import TopKMoE
@@ -7,7 +7,7 @@ from .distributed import ParallelPlan, build_parallel_plan, init_process_group
 from .checkpoint import save_sharded_state_dict, load_sharded_state_dict
 
 __all__ = [
-    "CalibriLLM", "ModelConfig", "SimpleTokenizer", "generate",
+    "AetherForgeLLM", "ModelConfig", "SimpleTokenizer", "generate",
     "TopKMoE", "KVCache", "ParallelPlan", "build_parallel_plan",
     "init_process_group", "save_sharded_state_dict", "load_sharded_state_dict",
 ]
