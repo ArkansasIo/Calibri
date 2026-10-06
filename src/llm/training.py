@@ -1,4 +1,4 @@
-"""Safe development/distributed training utilities for Calibri LLM."""
+"""Safe development/distributed training utilities for AetherForge LLM."""
 from dataclasses import dataclass
 import torch
 from torch.utils.data import DataLoader, Dataset
